@@ -1,6 +1,7 @@
 package br.com.fiap.ms_pedidos.service;
 
 import br.com.fiap.ms_pedidos.dto.PedidoDTO;
+import br.com.fiap.ms_pedidos.dto.StatusDTO;
 import br.com.fiap.ms_pedidos.model.Pedido;
 import br.com.fiap.ms_pedidos.model.Status;
 import br.com.fiap.ms_pedidos.repositories.PedidoRepository;
@@ -39,6 +40,27 @@ public class PedidoService {
                 () -> new ResourceNotFoundException(id)
         );
         return modelMapper.map(entity, PedidoDTO.class);
+    }
+    @Transactional
+    public void aprovarPagamentoPedido(Long id){
+        Pedido pedido = repository.getPedidoWithItems(id);
+        if(pedido == null){
+            throw new ResourceNotFoundException(id);
+        }
+
+        pedido.setStatus(Status.PAGO);
+        repository.updateStatus(Status.PAGO,pedido);
+    }
+
+    public PedidoDTO updatePedidoStatus(Long id, StatusDTO dto){
+        Pedido pedido = repository.getPedidoWithItems(id);
+        if(pedido == null){
+            throw new ResourceNotFoundException(id);
+        }
+
+        pedido.setStatus(dto.getStatus());
+        repository.updateStatus(dto.getStatus(),pedido);
+        return modelMapper.map(pedido,PedidoDTO.class);
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package br.com.fiap.ms_pedidos.controller;
 
 import br.com.fiap.ms_pedidos.dto.PedidoDTO;
+import br.com.fiap.ms_pedidos.dto.StatusDTO;
 import br.com.fiap.ms_pedidos.service.PedidoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -49,4 +50,18 @@ public class PedidoController {
 
         return ResponseEntity.created(uri).body(dto);
     }
+    @PutMapping("/{id}/pago")
+    public ResponseEntity<Void> aprovarPagamentoPedido(@PathVariable @NotNull Long id){
+        service.aprovarPagamentoPedido(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<PedidoDTO> updatePedidoStatus(@PathVariable Long id,
+                                                        @RequestBody StatusDTO dto){
+        PedidoDTO pedidoDTO = service.updatePedidoStatus(id,dto);
+        return ResponseEntity.ok(pedidoDTO);
+    }
+
+
 }
