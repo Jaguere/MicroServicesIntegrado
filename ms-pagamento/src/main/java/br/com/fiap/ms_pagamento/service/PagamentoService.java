@@ -3,6 +3,7 @@ package br.com.fiap.ms_pagamento.service;
 import br.com.fiap.ms_pagamento.dto.PagamentoDTO;
 import br.com.fiap.ms_pagamento.http.PedidoClient;
 import br.com.fiap.ms_pagamento.model.Pagamento;
+import br.com.fiap.ms_pagamento.model.Status;
 import br.com.fiap.ms_pagamento.repository.PagamentoRepository;
 import br.com.fiap.ms_pagamento.service.exception.DatabaseException;
 import br.com.fiap.ms_pagamento.service.exception.ResourceNotFoundException;
@@ -79,6 +80,25 @@ public class PagamentoService {
     @Transactional
     public void confirmarPagamentoDoPedido(Long id){
         Optional<Pagamento> pagamento = repository.findById(id);
+
+        if(pagamento.isEmpty()){
+            throw new ResourceNotFoundException("Recurso não encontrado! Id: "+id);
+        }
+        pagamento.get().setStatus(Status.CONFIRMADO);
+        repository.save(pagamento.get());
+
+        pedidoClient.atualizarPagamentoDoPedido(pagamento.get().getPedidoId());
+    }
+
+    public void alterarStatusDoPagamento(Long id){
+        Optional<Pagamento> pagamento = repository.findById(id);
+
+        if(pagamento.isEmpty()){
+            throw new ResourceNotFoundException("Recurso Não Encontrado! Id: "+id);
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO_SEM_INTEGRACAO);
+        repository.save(pagamento.get());
     }
 
     private void copyDtoToEntity(PagamentoDTO dto, Pagamento entity) {
